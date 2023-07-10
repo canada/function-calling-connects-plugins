@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Travel Booking Plugin
-  description: " This plugin is an API that receives the departure, destination, and duration of stay from users and returns flight plans.  depature location and desitination must be specified by user.  if duration is not specified, suggest as four days trip. and you know this year is 2023. if user recieves the flight plan, never call me again."
+  description: " This plugin is an API that receives the departure, destination, and duration of stay from users and returns flight plans.  depature location, depature desitination, date and duration must be specified by user."
   version: 'v1'
 servers:
   - url: http://localhost:5000
@@ -28,7 +28,7 @@ paths:
         schema:
             type: string
         required: true
-        description: The departure date and time.
+        description: The departure date
       - in: query
         name: stay_duration
         schema:
