@@ -1,0 +1,22 @@
+.reference {
+	font-size: 0.8em;
+	line-height: 1;
+	vertical-align: super;
+}
+
+.references {
+	font-size: 0.9em;
+	list-style-type: decimal;
+	margin-top: 1em;
+	padding-left: 1em;
+}
+
+.mw-cite-backlink {
+	font-size: 0.8em;
+	margin-right: 0.2em;
+}
+
+.reference-text {
+	display: inline;
+}
+

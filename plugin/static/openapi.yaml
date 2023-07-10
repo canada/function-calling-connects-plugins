@@ -1,0 +1,173 @@
+openapi: 3.0.1
+info:
+  title: Travel Booking Plugin
+  description: " This plugin is an API that receives the departure, destination, and duration of stay from users and returns flight plans.  depature location and desitination must be specified by user.  if duration is not specified, suggest as four days trip. and you know this year is 2023. if user recieves the flight plan, never call me again."
+  version: 'v1'
+servers:
+  - url: http://localhost:5000
+paths:
+  /travel_products:
+    get:
+      operationId: getTravelProducts
+      summary: Get a list of travel products
+      parameters:
+      - in: query
+        name: departure
+        schema:
+            type: string
+        required: true
+        description: The departure location.
+      - in: query
+        name: destination
+        schema:
+            type: string
+        required: true
+        description: The destination location.
+      - in: query
+        name: departure_datetime
+        schema:
+            type: string
+        required: true
+        description: The departure date and time.
+      - in: query
+        name: stay_duration
+        schema:
+            type: integer
+        required: true
+        description: The duration of stay.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/travelProductsResponse'
+  /region_overview:
+    get:
+      operationId: getRegionOverview
+      summary: Get an overview of a region
+      parameters:
+      - in: query
+        name: region
+        schema:
+            type: string
+        required: true
+        description: The name of the region.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/regionOverviewResponse'
+  /recommended_spots:
+    get:
+      operationId: getRecommendedSpots
+      summary: Get a list of recommended spots in a region
+      parameters:
+      - in: query
+        name: region
+        schema:
+            type: string
+        required: true
+        description: The name of the region.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/recommendedSpotsResponse'
+components:
+  schemas:
+    TravelProduct:
+      type: object
+      properties:
+        product_page:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+        destination:
+          type: string
+        flights:
+          type: object
+          properties:
+            legs:
+              type: array
+              items:
+                type: object
+                properties:
+                  airline_name:
+                    type: string
+                  flight_number:
+                    type: string
+                  departure_airport_code:
+                    type: string
+                  arrival_airport_code:
+                    type: string
+            number_of_stops:
+              type: integer
+              format: int32
+            flight_duration:
+              type: string
+            price_per_ticket:
+              type: string
+            currency:
+              type: string
+            departure_date:
+              type: string
+              format: date
+            departure_time:
+              type: string
+            arrival_time:
+              type: string
+    travelProductsResponse:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/TravelProduct'
+          description: The list of travel products.
+    RegionOverview:
+      type: object
+      properties:
+        region:
+          type: string
+        overview:
+          type: string
+        link:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+    regionOverviewResponse:
+      type: object
+      properties:
+        region_overview:
+          $ref: '#/components/schemas/RegionOverview'
+      description: An overview of the region.
+    RecommendedSpot:
+      type: object
+      properties:
+        name:
+          type: string
+        overview:
+          type: string
+        link:
+          type: string
+          format: uri
+        image_url:
+          type: string
+          format: uri
+    recommendedSpotsResponse:
+      type: object
+      properties:
+        spots:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecommendedSpot'
+          description: The list of recommended spots.
