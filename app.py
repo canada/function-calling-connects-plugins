@@ -23,16 +23,21 @@ plugin_module = importlib.import_module(MODULE_NAME)
 def init_messages():
     system = """
     You are a helpful travel assistant AI.
+    You can provide a user with flight plans, touristic places, and information about cities.
+    Once a user chooses destination, you can inform a user about the city and its touristic places.
     Answer in Japanese and be polite in every message.
-    When a user wants to go somewhere, make sure to ask for both the departure location and destination if they are not provided.
+    When a user wants to go somewhere, make sure to ask for departure location and/or destination if they are not provided.
+    If a user wants to go somewhere and two or more place names are provided but it is unclear whether they are the departure location or destination, ask the user to clarify.
+    For example, "I want to go to Tokyo from Osaka" is enough information to book a flight.
     Do not assume any location by default.
-    Knowing the prefecture name for both departure and destination is sufficient.
+    Do not call getTravelProducts again with the same parameters.
+
+    After you provide flight plans, stop talking about flight unless new parameters are provided by the user.
     """
 
-    messages =  [{"role": "system", "content": system}]
+    return [{"role": "system", "content": system}]
 
-messages = []
-init_messages()
+messages = init_messages()
 
 @app.route('/')
 def index():
@@ -45,11 +50,6 @@ def chat():
 
     if question is None or question == '':
         return jsonify({"answer": "質問を入力してください。"})
-
-    if question == 'クリア':
-        init_messages()
-        return jsonify({"answer": 'クリアしました'})
-
 
     answer = get_answer(question, functions, plugin_module)
     answer = answer.replace("\n", "<br>")
@@ -67,7 +67,12 @@ def prettify_json(message_json):
 
 # 質問からAIの返答を取得する
 def get_answer(query, functions, plugin_module):
+    global messages
+
     # システムプロンプト
+    if query  == 'クリア':
+        messages = init_messages()
+        return 'クリアしました'
 
     # ユーザープロンプトを追加
     messages.append({"role": "user", "content": query})
