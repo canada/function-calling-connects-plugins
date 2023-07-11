@@ -1,9 +1,9 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Travel Booking System (no auth)",
-  "name_for_model": "travel_booking",
-  "description_for_human": "Book and manage travel products and get recommendations.",
-  "description_for_model": "This plugin is an API that receives the departure location, destination, departure and time, and duration of stay from users and returns flight plans. It responds to questions like 'I want to go from Osaka to Tokyo.'",
+  "name_for_human": "Restaurant Search and Reservation System (no auth)",
+  "name_for_model": "restaurant_search_reservation",
+  "description_for_human": "Search for restaurants and make reservations.",
+  "description_for_model": "This plugin is an API that receives search queries from users and returns restaurant search results. It also allows users to make reservations at the selected restaurants. It responds to questions like 'I want to find a sushi restaurant in Tokyo.'",
   "auth": {
     "type": "none"
   },

@@ -1,173 +1,134 @@
 openapi: 3.0.1
 info:
-  title: Travel Booking Plugin
-  description: " This plugin is an API that receives the departure, destination, and duration of stay from users and returns flight plans.  depature location, depature desitination, date and duration must be specified by user."
+  title: Restaurant Search and Reservation Plugin
+  description: "This plugin provides APIs for searching restaurants and making reservations."
   version: 'v1'
 servers:
   - url: http://localhost:5000
 paths:
-  /travel_products:
+  /search_restaurants:
     get:
-      operationId: getTravelProducts
-      summary: Get a list of travel products
+      operationId: searchRestaurants
+      summary: Search for restaurants
       parameters:
       - in: query
-        name: departure
+        name: query
         schema:
             type: string
         required: true
-        description: The departure location.
+        description: The search query for restaurants.
       - in: query
-        name: destination
+        name: date
         schema:
             type: string
         required: true
-        description: The destination location.
+        description: The reservation date.
       - in: query
-        name: departure_datetime
-        schema:
-            type: string
-        required: true
-        description: The departure date
-      - in: query
-        name: stay_duration
+        name: party_size
         schema:
             type: integer
         required: true
-        description: The duration of stay.
+        description: The number of people in the party.
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/travelProductsResponse'
-  /region_overview:
-    get:
-      operationId: getRegionOverview
-      summary: Get an overview of a region
+                $ref: '#/components/schemas/searchRestaurantsResponse'
+  /make_reservation:
+    post:
+      operationId: makeReservation
+      summary: Make a reservation at a restaurant
       parameters:
       - in: query
-        name: region
+        name: restaurant_id
         schema:
             type: string
         required: true
-        description: The name of the region.
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/regionOverviewResponse'
-  /recommended_spots:
-    get:
-      operationId: getRecommendedSpots
-      summary: Get a list of recommended spots in a region
-      parameters:
+        description: The ID of the restaurant.
       - in: query
-        name: region
+        name: date
         schema:
             type: string
         required: true
-        description: The name of the region.
+        description: The reservation date.
+      - in: query
+        name: time
+        schema:
+            type: string
+        required: true
+        description: The reservation time.
+      - in: query
+        name: party_size
+        schema:
+            type: integer
+        required: true
+        description: The number of people in the party.
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/recommendedSpotsResponse'
+                $ref: '#/components/schemas/makeReservationResponse'
 components:
   schemas:
-    TravelProduct:
-      type: object
-      properties:
-        product_page:
-          type: string
-          format: uri
-        image_url:
-          type: string
-          format: uri
-        destination:
-          type: string
-        flights:
-          type: object
-          properties:
-            legs:
-              type: array
-              items:
-                type: object
-                properties:
-                  airline_name:
-                    type: string
-                  flight_number:
-                    type: string
-                  departure_airport_code:
-                    type: string
-                  arrival_airport_code:
-                    type: string
-            number_of_stops:
-              type: integer
-              format: int32
-            flight_duration:
-              type: string
-            price_per_ticket:
-              type: string
-            currency:
-              type: string
-            departure_date:
-              type: string
-              format: date
-            departure_time:
-              type: string
-            arrival_time:
-              type: string
-    travelProductsResponse:
-      type: object
-      properties:
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/TravelProduct'
-          description: The list of travel products.
-    RegionOverview:
-      type: object
-      properties:
-        region:
-          type: string
-        overview:
-          type: string
-        link:
-          type: string
-          format: uri
-        image_url:
-          type: string
-          format: uri
-    regionOverviewResponse:
-      type: object
-      properties:
-        region_overview:
-          $ref: '#/components/schemas/RegionOverview'
-      description: An overview of the region.
-    RecommendedSpot:
+    Restaurant:
       type: object
       properties:
         name:
           type: string
-        overview:
+        address:
+          type: string
+        rating:
+          type: number
+          format: float
+        price_range:
           type: string
         link:
           type: string
           format: uri
-        image_url:
-          type: string
-          format: uri
-    recommendedSpotsResponse:
+    searchRestaurantsResponse:
       type: object
       properties:
-        spots:
+        restaurants:
           type: array
           items:
-            $ref: '#/components/schemas/RecommendedSpot'
-          description: The list of recommended spots.
+            $ref: '#/components/schemas/Restaurant'
+          description: The list of restaurants.
+    makeReservation:
+      type: object
+      properties:
+        restaurant_id:
+          type: string
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+        party_size:
+          type: integer
+          format: int32
+      required:
+        - restaurant_id
+        - date
+        - time
+        - party_size
+    makeReservationResponse:
+      type: object
+      properties:
+        restaurant_id:
+          type: string
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+        party_size:
+          type: integer
+          format: int32
+        reservation_status:
+          type: string
+        confirmation_number:
+          type: string

@@ -7,26 +7,35 @@ sys.path.insert(0, parent_dir)
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
 sys.path.insert(0, parent_dir)
 
-from flask import Flask, jsonify, send_from_directory
-from mock_data import get_travel_products, get_region_overview, get_recommended_spots
+from flask import Flask, jsonify, send_from_directory, request
+from mock_data import search_restaurants, make_reservation
 
 app = Flask(__name__, static_folder='static')
 
-@app.route('/travel_products', methods=['GET'])
-def travel_products(arg):
-    products = get_travel_products()
-    return jsonify(products=products)
+@app.route('/search_restaurants', methods=['GET'])
+def search_restaurants_route():
+    query = request.args.get('query')
+    date = request.args.get('date')
+    party_size = int(request.args.get('party_size'))
 
-@app.route('/region_overview', methods=['GET'])
-def region_overview(arg):
-    region_data = get_region_overview(arg)
-    print(region_data)
-    return jsonify(region_data)
+    if not all([query, date, party_size]):
+        return jsonify({"error": "Missing required parameters"}), 400
 
-@app.route('/recommended_spots', methods=['GET'])
-def recommended_spots(arg):
-    spots = get_recommended_spots()
-    return jsonify(spots=spots)
+    restaurants = search_restaurants(query, date, party_size)
+    return jsonify(restaurants=restaurants)
+
+@app.route('/make_reservation', methods=['POST'])
+def make_reservation_route():
+    restaurant_id = request.form.get('restaurant_id')
+    date = request.form.get('date')
+    time = request.form.get('time')
+    party_size = int(request.form.get('party_size'))
+
+    if not all([restaurant_id, date, time, party_size]):
+        return jsonify({"error": "Missing required parameters"}), 400
+
+    reservation = make_reservation(restaurant_id, date, time, party_size)
+    return jsonify(reservation=reservation)
 
 @app.route('/logo.png', methods=['GET'])
 def plugin_logo():
@@ -39,6 +48,7 @@ def plugin_manifest():
 @app.route('/openapi.yaml', methods=['GET'])
 def openapi_spec():
     return send_from_directory(app.static_folder, 'openapi.yaml', mimetype='text/yaml')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

@@ -22,18 +22,17 @@ plugin_module = importlib.import_module(MODULE_NAME)
 
 def init_messages():
     system = """
-    You are a helpful travel assistant AI.
+    You are a helpful restaurant search assistant AI.
     Repeat the user's question and answer it.
-    You can provide a user with flight plans, touristic places, and information about cities.
-    Once a user chooses destination, you can inform a user about the city, flight, and its touristic places.
+    You can provide users with restaurant search and reservation information.
+    Once a user chooses a destination, you can inform them about the restaurants in the area and how to make reservations.
     Answer in Japanese and be polite in every message.
 
     If a user wants to go somewhere and two or more place names are provided but it is too ambiguous whether they are the departure location or destination, ask the user to clarify.
-    Make sure that you asked about depature date and duration of stay before search for flight plans.
     For example, "going to Tokyo from Osaka" is not ambiguous, but "I want to go to Tokyo and Osaka" is ambiguous.
     Do not assume any location by default.
 
-    When you provide flight plans, list the information you know and just say "click the link for more details" and help user to know touristic places or city information.
+    When providing restaurant search results, list the information you know and just say "click the link for more details" and help the user to learn about tourist spots or city information.
     """
 
     return [{"role": "system", "content": system}]
@@ -113,8 +112,9 @@ def get_answer(query, functions, plugin_module):
         from flask import Flask
         app = Flask(__name__)
         with app.app_context():
-            function_response = getattr(plugin_module, f_call["name"])(f_call["arguments"]).data.decode('utf-8')
+            function_response = getattr(plugin_module, f_call["name"])(f_call["arguments"])
 
+        function_response = json.dumps(function_response)
         print("Function response: " + function_response + "\n")
 
         # messagesに関数のレスポンスを追加
