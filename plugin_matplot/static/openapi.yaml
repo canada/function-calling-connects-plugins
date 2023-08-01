@@ -1,0 +1,51 @@
+openapi: 3.0.1
+info:
+  title: Python Execute
+  description: "This plugin is for execute python code. this api can use matplot and numpy, and use plt.show() when user want to show plot."
+  version: 'v1'
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /python_execute:
+    post:
+      operationId: executePythonCode
+      summary: execute python code. this api can use matplot and numpy, and use plt.show() when user want to show plot.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: The Python code to execute. matplot and numpy can be used. write plt.show() when user want to show plot.
+              required:
+                - code
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/executePythonCodeResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+
+components:
+  schemas:
+    executePythonCodeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The status message.
+        output:
+          type: string
+          description: The output of the executed Python code.
+        error:
+          type: string
+          description: The error message of the executed Python code.

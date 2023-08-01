@@ -46,7 +46,7 @@ class OpenApiToFunctionConverter:
                     "responses": {},
                 }
 
-                for parameter in details["parameters"]:
+                for parameter in details.get("parameters", []):
                     param_name = parameter["name"]
                     function["parameters"]["properties"][param_name] = {
                         "type": parameter["schema"]["type"],
@@ -55,9 +55,22 @@ class OpenApiToFunctionConverter:
                     if parameter["required"]:
                         function["parameters"]["required"].append(param_name)
 
+                if "requestBody" in details:
+                    for media_type, media_details in details["requestBody"]["content"].items():
+                        for param_name, param_schema in media_details["schema"]["properties"].items():
+                            function["parameters"]["properties"][param_name] = {
+                                "type": param_schema["type"],
+                                "description": param_schema.get("description", ""),
+                            }
+                        if "required" in media_details["schema"]:
+                            function["parameters"]["required"].extend(media_details["schema"]["required"])
+
                 for response_code, response_details in details["responses"].items():
-                    response_schema = response_details["content"]["application/json"]["schema"]
-                    resolved_schema = OpenApiToFunctionConverter._resolve_schema(response_schema, components_schemas)
+                    content = response_details.get("content")
+                    if content and "application/json" in content:
+                        response_schema = content["application/json"]["schema"]
+                        resolved_schema = OpenApiToFunctionConverter._resolve_schema(response_schema, components_schemas)
+
                     function["responses"][response_code] = {
                         "description": response_details["description"],
                         "schema": resolved_schema,
